@@ -1,13 +1,18 @@
+import { useState } from 'react'
 import { APP_CATCHPHRASE, APP_NAME, APP_VERSION } from './config/app'
 import { levelFromXp } from './config/level'
 import { NameForm } from './features/auth/NameForm'
 import { useAuth } from './features/auth/useAuth'
-import { ExpeditionPanel } from './features/expedition/ExpeditionPanel'
-import { ReturnResult } from './features/expedition/ReturnResult'
-import { useExpedition } from './features/expedition/useExpedition'
-import { TaskArea } from './features/tasks/TaskArea'
-import type { Profile } from './types/profile'
+import { ChallengeDialog } from './features/quests/ChallengeDialog'
+import { QuestActions } from './features/quests/QuestActions'
+import { QuestListPage } from './features/quests/QuestListPage'
+import { ReserveDialog } from './features/quests/ReserveDialog'
+import { useQuests } from './features/quests/useQuests'
+import { QuestSessionPanel } from './features/session/QuestSessionPanel'
+import { ReturnResult } from './features/session/ReturnResult'
+import { useQuestSession } from './features/session/useQuestSession'
 import { isSupabaseConfigured } from './lib/supabase'
+import type { Profile } from './types/profile'
 
 export default function App() {
   const { state, register } = useAuth()
@@ -32,38 +37,105 @@ export default function App() {
   )
 }
 
-/** ログイン後のホーム画面（焚き火エリア＋タスクエリア） */
+type Page = 'home' | 'quests'
+type Dialog = { kind: 'challenge' } | { kind: 'reserve'; title: string } | null
+
+/** ログイン後の画面 */
 function Home({ profile }: { profile: Profile }) {
-  const expedition = useExpedition()
+  const quests = useQuests()
+  const session = useQuestSession(quests.refresh)
+  const [page, setPage] = useState<Page>('home')
+  const [dialog, setDialog] = useState<Dialog>(null)
+
+  const busy = session.loading || session.active !== null
+
+  async function startQuest(title: string) {
+    const ok = await session.start(title)
+    if (ok) {
+      setDialog(null)
+      setPage('home')
+    }
+  }
 
   return (
-    <div className="layout">
-      {/* 焚き火キャンプエリア（スマホ：上 / PC：左） */}
-      <section className="camp-area">
-        <p>ようこそ、{profile.name} さん</p>
-        <p>
-          Lv.{levelFromXp(profile.xp)} ／ XP {profile.xp} ／ {profile.gold}G ／ 薪 {profile.firewood}本
-        </p>
+    <>
+      {/* メニュー */}
+      <nav className="tabs">
+        <button className={page === 'home' ? 'active' : ''} onClick={() => setPage('home')}>
+          キャンプ
+        </button>
+        <button className={page === 'quests' ? 'active' : ''} onClick={() => setPage('quests')}>
+          クエスト一覧
+        </button>
+      </nav>
 
-        {expedition.error && <p className="error">エラー：{expedition.error}</p>}
-        {expedition.active && (
-          <ExpeditionPanel
-            session={expedition.active}
-            elapsedSec={expedition.elapsedSec}
-            onReturn={expedition.end}
+      {(session.error || quests.error) && (
+        <p className="error">エラー：{session.error ?? quests.error}</p>
+      )}
+
+      {page === 'home' && (
+        <div className="layout">
+          {/* 焚き火キャンプエリア（スマホ：上 / PC：左） */}
+          <section className="camp-area">
+            <p>ようこそ、{profile.name} さん</p>
+            <p>
+              Lv.{levelFromXp(profile.xp)} ／ XP {profile.xp} ／ {profile.gold}G ／ 薪 {profile.firewood}本
+            </p>
+            {session.active && (
+              <QuestSessionPanel
+                session={session.active}
+                elapsedSec={session.elapsedSec}
+                onReturn={session.end}
+              />
+            )}
+            {session.lastResult && (
+              <ReturnResult session={session.lastResult} onClose={session.dismissResult} />
+            )}
+            <p className="muted small">（焚き火はステップ6で作る）</p>
+          </section>
+
+          {/* クエストエリア（スマホ：下 / PC：右） */}
+          <QuestActions
+            busy={busy}
+            todayReservations={quests.todayReservations}
+            pinnedQuests={quests.pinnedQuests}
+            onOpenChallenge={() => setDialog({ kind: 'challenge' })}
+            onOpenReserve={() => setDialog({ kind: 'reserve', title: '' })}
+            onStart={startQuest}
           />
-        )}
-        {expedition.lastResult && (
-          <ReturnResult session={expedition.lastResult} onClose={expedition.dismissResult} />
-        )}
-        <p className="muted">（焚き火はステップ6で作る）</p>
-      </section>
+        </div>
+      )}
 
-      {/* タスク＆出撃エリア（スマホ：下 / PC：右） */}
-      <TaskArea
-        onExpedition={expedition.loading || expedition.active !== null}
-        onStart={expedition.start}
-      />
-    </div>
+      {page === 'quests' && (
+        <QuestListPage
+          quests={quests.quests}
+          upcomingReservations={quests.upcomingReservations}
+          missedReservations={quests.missedReservations}
+          busy={busy}
+          onStart={startQuest}
+          onReserve={(title) => setDialog({ kind: 'reserve', title })}
+          onTogglePin={quests.togglePin}
+          onCancelReservation={quests.cancelReservation}
+        />
+      )}
+
+      {dialog?.kind === 'challenge' && (
+        <ChallengeDialog
+          recentQuests={quests.recentQuests}
+          onSubmit={startQuest}
+          onClose={() => setDialog(null)}
+        />
+      )}
+      {dialog?.kind === 'reserve' && (
+        <ReserveDialog
+          recentQuests={quests.recentQuests}
+          initialTitle={dialog.title}
+          onSubmit={async (input) => {
+            if (await quests.reserve(input)) setDialog(null)
+          }}
+          onClose={() => setDialog(null)}
+        />
+      )}
+    </>
   )
 }

@@ -1,5 +1,5 @@
 // 報酬まわりの数値（暫定値。あとで調整する）
-import { FIRST_STRIKE_SEC } from './expedition'
+import { FIRST_STRIKE_SEC } from './quest'
 
 export type ChestRank = 'none' | 'wood' | 'silver' | 'gold'
 

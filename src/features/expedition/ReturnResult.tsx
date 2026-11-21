@@ -5,10 +5,15 @@ import type { SessionWithTask } from '../../types/workSession'
 
 type Props = {
   session: SessionWithTask
+  /** そのタスクがまだ未完了か（完了済みなら「討伐完了」ボタンは出さない） */
+  canComplete: boolean
+  /** 討伐完了にして閉じる */
+  onComplete: () => void
+  /** タスクを残したまま閉じる（また挑む） */
   onClose: () => void
 }
 
-export function ReturnResult({ session, onClose }: Props) {
+export function ReturnResult({ session, canComplete, onComplete, onClose }: Props) {
   const sec = session.recorded_duration_sec ?? 0
   return (
     <div className="return-result">
@@ -19,7 +24,15 @@ export function ReturnResult({ session, onClose }: Props) {
         「{session.taskTitle}」 記録 {formatDuration(sec)} ／ {CHEST_LABEL[chestRankFromSec(sec)]}
       </p>
       <p className="muted">（報酬の受け取りはステップ5で作る）</p>
-      <button onClick={onClose}>OK</button>
+      <p>このモンスターは？</p>
+      <div className="result-actions">
+        {canComplete && (
+          <button className="primary" onClick={onComplete}>
+            討伐完了！
+          </button>
+        )}
+        <button onClick={onClose}>{canComplete ? 'また挑む' : 'OK'}</button>
+      </div>
     </div>
   )
 }
