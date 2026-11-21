@@ -99,3 +99,22 @@ header {
 .task-actions .primary {
   font-weight: bold;
 }
+
+/* 遠征 */
+.expedition,
+.return-result {
+  border: 1px solid #8884;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.timer {
+  font-size: 2.5rem;
+  font-variant-numeric: tabular-nums; /* 数字の幅をそろえて表示がガタつかないように */
+  margin: 8px 0;
+}
+.return-button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+}

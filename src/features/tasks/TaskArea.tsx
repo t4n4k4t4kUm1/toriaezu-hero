@@ -2,7 +2,13 @@
 import { TaskForm } from './TaskForm'
 import { useTasks } from './useTasks'
 
-export function TaskArea() {
+type Props = {
+  /** 遠征中かどうか（遠征中は他のタスクに出撃できない） */
+  onExpedition: boolean
+  onStart: (taskId: string, taskTitle: string) => void
+}
+
+export function TaskArea({ onExpedition, onStart }: Props) {
   const { todayTasks, skippedTasks, loading, error, addTask, completeTask, skipToday, unskip } =
     useTasks()
 
@@ -22,8 +28,11 @@ export function TaskArea() {
           <li key={task.id} className="task-item">
             <span className="task-title">{task.title}</span>
             <div className="task-actions">
-              {/* ステップ4で遠征タイマーにつなぐ */}
-              <button className="primary" disabled title="ステップ4で実装">
+              <button
+                className="primary"
+                disabled={onExpedition}
+                onClick={() => onStart(task.id, task.title)}
+              >
                 1分だけ触る
               </button>
               <button onClick={() => completeTask(task.id)}>討伐完了</button>
