@@ -1,0 +1,22 @@
+/* MVPでは最小限の見た目だけ。デザインは後で決める。 */
+:root {
+  font-family: system-ui, sans-serif;
+  color-scheme: light dark;
+}
+body {
+  margin: 0;
+}
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  text-align: center;
+}
+.catchphrase {
+  opacity: 0.8;
+}
+.status,
+.version {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
