@@ -6,12 +6,14 @@ import { RecentQuestChips } from './RecentQuestChips'
 
 type Props = {
   recentQuests: Quest[]
+  /** 最初から入れておくクエスト名（ピン留めから開いたとき） */
+  initialTitle?: string
   onSubmit: (title: string) => Promise<void>
   onClose: () => void
 }
 
-export function ChallengeDialog({ recentQuests, onSubmit, onClose }: Props) {
-  const [title, setTitle] = useState('')
+export function ChallengeDialog({ recentQuests, initialTitle = '', onSubmit, onClose }: Props) {
+  const [title, setTitle] = useState(initialTitle)
   const [sending, setSending] = useState(false)
   const trimmed = title.trim()
 

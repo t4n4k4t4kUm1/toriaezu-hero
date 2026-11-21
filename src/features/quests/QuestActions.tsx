@@ -6,7 +6,8 @@ type Props = {
   busy: boolean // 挑戦中は新しく挑戦できない
   todayReservations: ReservationWithTitle[]
   pinnedQuests: Quest[]
-  onOpenChallenge: () => void
+  /** 挑戦ダイアログを開く（title を渡すと、その名前を入れた状態で開く） */
+  onOpenChallenge: (title?: string) => void
   onOpenReserve: () => void
   onStart: (title: string) => void
 }
@@ -22,7 +23,7 @@ export function QuestActions({
   return (
     <section className="quest-actions">
       <div className="main-buttons">
-        <button className="primary big" disabled={busy} onClick={onOpenChallenge}>
+        <button className="primary big" disabled={busy} onClick={() => onOpenChallenge()}>
           クエストに挑戦
         </button>
         <button className="big" onClick={onOpenReserve}>
@@ -57,9 +58,10 @@ export function QuestActions({
       {pinnedQuests.length > 0 && (
         <>
           <h2>ピン留めクエスト</h2>
+          <p className="muted small">タップすると挑戦の確認が出ます</p>
           <div className="chips">
             {pinnedQuests.map((q) => (
-              <button key={q.id} className="chip" disabled={busy} onClick={() => onStart(q.title)}>
+              <button key={q.id} className="chip" disabled={busy} onClick={() => onOpenChallenge(q.title)}>
                 {q.title}
               </button>
             ))}

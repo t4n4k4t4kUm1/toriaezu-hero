@@ -38,7 +38,7 @@ export default function App() {
 }
 
 type Page = 'home' | 'quests'
-type Dialog = { kind: 'challenge' } | { kind: 'reserve'; title: string } | null
+type Dialog = { kind: 'challenge'; title: string } | { kind: 'reserve'; title: string } | null
 
 /** ログイン後の画面 */
 function Home({ profile }: { profile: Profile }) {
@@ -99,7 +99,7 @@ function Home({ profile }: { profile: Profile }) {
             busy={busy}
             todayReservations={quests.todayReservations}
             pinnedQuests={quests.pinnedQuests}
-            onOpenChallenge={() => setDialog({ kind: 'challenge' })}
+            onOpenChallenge={(title = '') => setDialog({ kind: 'challenge', title })}
             onOpenReserve={() => setDialog({ kind: 'reserve', title: '' })}
             onStart={startQuest}
           />
@@ -122,6 +122,7 @@ function Home({ profile }: { profile: Profile }) {
       {dialog?.kind === 'challenge' && (
         <ChallengeDialog
           recentQuests={quests.recentQuests}
+          initialTitle={dialog.title}
           onSubmit={startQuest}
           onClose={() => setDialog(null)}
         />
