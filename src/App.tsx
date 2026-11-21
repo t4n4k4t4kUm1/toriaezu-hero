@@ -2,6 +2,7 @@ import { APP_CATCHPHRASE, APP_NAME, APP_VERSION } from './config/app'
 import { levelFromXp } from './config/level'
 import { NameForm } from './features/auth/NameForm'
 import { useAuth } from './features/auth/useAuth'
+import { TaskArea } from './features/tasks/TaskArea'
 import { isSupabaseConfigured } from './lib/supabase'
 
 export default function App() {
@@ -21,14 +22,20 @@ export default function App() {
       {state.status === 'needsName' && <NameForm onSubmit={register} />}
 
       {state.status === 'ready' && (
-        <section className="status-panel">
-          <p>ようこそ、{state.profile.name} さん</p>
-          <p>
-            Lv.{levelFromXp(state.profile.xp)} ／ XP {state.profile.xp} ／ {state.profile.gold}G ／ 薪{' '}
-            {state.profile.firewood}本
-          </p>
-          {/* ステップ3以降：ここに焚き火エリアとタスクエリアを置く */}
-        </section>
+        <div className="layout">
+          {/* 焚き火キャンプエリア（スマホ：上 / PC：左） */}
+          <section className="camp-area">
+            <p>ようこそ、{state.profile.name} さん</p>
+            <p>
+              Lv.{levelFromXp(state.profile.xp)} ／ XP {state.profile.xp} ／ {state.profile.gold}G ／ 薪{' '}
+              {state.profile.firewood}本
+            </p>
+            <p className="muted">（焚き火はステップ6で作る）</p>
+          </section>
+
+          {/* タスク＆出撃エリア（スマホ：下 / PC：右） */}
+          <TaskArea />
+        </div>
       )}
 
       <footer className="version">v{APP_VERSION}</footer>
