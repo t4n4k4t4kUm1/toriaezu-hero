@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MAX_SESSION_SEC } from '../../config/quest'
 import { todayLocal } from '../../lib/date'
+import { syncServerClock } from '../../lib/serverClock'
 import { supabase } from '../../lib/supabase'
 import { useNow } from '../../lib/time'
 import type { QuestSession, SessionWithTitle } from '../../types/quest'
@@ -21,11 +22,11 @@ export function useQuestSession(onChange?: () => void) {
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const { data, error } = await supabase
-        .from('quest_sessions')
-        .select('*, quests(title)')
-        .is('ended_at', null)
-        .maybeSingle<Row>()
+      // 時計のずれを測るのと、挑戦中のクエストを探すのを同時に行う
+      const [, { data, error }] = await Promise.all([
+        syncServerClock(),
+        supabase.from('quest_sessions').select('*, quests(title)').is('ended_at', null).maybeSingle<Row>(),
+      ])
       if (cancelled) return
       if (error) setError(error.message)
       else if (data) {
@@ -47,10 +48,11 @@ export function useQuestSession(onChange?: () => void) {
   const start = useCallback(async (title: string) => {
     setError(null)
     setLastResult(null)
-    const { data, error } = await supabase.rpc('start_quest', {
-      p_title: title,
-      p_today: todayLocal(),
-    })
+    // 挑戦の開始と同時に、時計のずれも測り直す（スマホのスリープ明けなどに備えて）
+    const [, { data, error }] = await Promise.all([
+      syncServerClock(),
+      supabase.rpc('start_quest', { p_title: title, p_today: todayLocal() }),
+    ])
     if (error) {
       setError(error.message)
       return false
