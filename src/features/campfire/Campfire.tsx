@@ -6,9 +6,11 @@ import type { Camper } from './useCampfire'
 type Props = {
   campers: Camper[]
   connected: boolean
+  /** 接続の状態（つながらないときの原因調べ用） */
+  status: string
 }
 
-export function Campfire({ campers, connected }: Props) {
+export function Campfire({ campers, connected, status }: Props) {
   const now = useNow()
 
   return (
@@ -16,7 +18,11 @@ export function Campfire({ campers, connected }: Props) {
       <div className="fire" aria-hidden="true">
         🔥
       </div>
-      {!connected && <p className="muted small">焚き火に接続中…</p>}
+      {!connected && (
+        <p className="muted small">
+          焚き火に接続中…{status !== 'CONNECTING' && `（${status}）`}
+        </p>
+      )}
 
       <ul className="campers">
         {campers.map((c) => (

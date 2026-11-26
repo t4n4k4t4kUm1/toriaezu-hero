@@ -98,7 +98,7 @@ function Home({
                 onReturn={session.end}
               />
             )}
-            <Campfire campers={campfire.campers} connected={campfire.connected} />
+            <Campfire campers={campfire.campers} connected={campfire.connected} status={campfire.status} />
             <PrivacyToggle profile={profile} onChange={onProfileChange} />
           </section>
 

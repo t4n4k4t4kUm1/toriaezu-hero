@@ -9,7 +9,11 @@ const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined
 /** URL とキーが両方そろっているか */
 export const isSupabaseConfigured = Boolean(url && key)
 
-export const supabase = createClient(
-  url ?? 'http://localhost',
-  key ?? 'missing-key',
-)
+export const supabase = createClient(url ?? 'http://localhost', key ?? 'missing-key', {
+  realtime: {
+    // 裏に回したタブでも接続が切れないようにする。
+    // ブラウザは見ていないタブのタイマーを間引くので、「生きてるよ」の合図（ハートビート）が遅れて
+    // 接続が切れてしまう。Web Worker（裏で動く別の作業員）に合図を任せると、間引かれにくくなる。
+    worker: true,
+  },
+})
