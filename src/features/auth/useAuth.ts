@@ -74,5 +74,12 @@ export function useAuth() {
     setState({ status: 'ready', profile })
   }, [])
 
-  return { state, register }
+  // 報酬を受け取ったあとなどに、プロフィールの値を書き換える（画面の表示用）
+  const patchProfile = useCallback((changes: Partial<Profile>) => {
+    setState((prev) =>
+      prev.status === 'ready' ? { status: 'ready', profile: { ...prev.profile, ...changes } } : prev,
+    )
+  }, [])
+
+  return { state, register, patchProfile }
 }

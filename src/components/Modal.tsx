@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 
 type Props = {
   title: string
-  onClose: () => void
+  /** 渡さないと「×」と外側クリックで閉じられなくなる（必ず最後まで進めてほしいとき） */
+  onClose?: () => void
   children: ReactNode
 }
 
@@ -14,9 +15,11 @@ export function Modal({ title, onClose, children }: Props) {
       <div className="modal" role="dialog" aria-label={title} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="icon-button" onClick={onClose} aria-label="閉じる">
-            ×
-          </button>
+          {onClose && (
+            <button className="icon-button" onClick={onClose} aria-label="閉じる">
+              ×
+            </button>
+          )}
         </div>
         {children}
       </div>

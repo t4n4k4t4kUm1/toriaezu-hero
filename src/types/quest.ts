@@ -55,3 +55,17 @@ export type ReserveInput = {
   time: string | null // 'HH:MM'
   trigger: string | null
 }
+
+/** 報酬を受け取ったときの結果（DB の claim_reward 関数が返すもの） */
+export type ClaimResult = {
+  earned_xp: number
+  earned_gold: number
+  chest: 'none' | 'wood' | 'silver' | 'gold'
+  rarity: 'none' | 'normal' | 'rare' | 'epic'
+  honest_bonus: boolean
+  declared_sec: number
+  // 受け取ったあとのプロフィールの値
+  xp: number
+  gold: number
+  firewood: number
+}

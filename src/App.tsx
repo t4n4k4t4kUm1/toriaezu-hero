@@ -15,7 +15,7 @@ import { isSupabaseConfigured } from './lib/supabase'
 import type { Profile } from './types/profile'
 
 export default function App() {
-  const { state, register } = useAuth()
+  const { state, register, patchProfile } = useAuth()
 
   return (
     <main className="app">
@@ -30,7 +30,7 @@ export default function App() {
       {state.status === 'error' && <p className="error">エラー：{state.message}</p>}
       {state.status === 'needsName' && <NameForm onSubmit={register} />}
 
-      {state.status === 'ready' && <Home profile={state.profile} />}
+      {state.status === 'ready' && <Home profile={state.profile} onProfileChange={patchProfile} />}
 
       <footer className="version">v{APP_VERSION}</footer>
     </main>
@@ -41,7 +41,13 @@ type Page = 'home' | 'quests'
 type Dialog = { kind: 'challenge'; title: string } | { kind: 'reserve'; title: string } | null
 
 /** ログイン後の画面 */
-function Home({ profile }: { profile: Profile }) {
+function Home({
+  profile,
+  onProfileChange,
+}: {
+  profile: Profile
+  onProfileChange: (changes: Partial<Profile>) => void
+}) {
   const quests = useQuests()
   const session = useQuestSession(quests.refresh)
   const [page, setPage] = useState<Page>('home')
@@ -88,9 +94,6 @@ function Home({ profile }: { profile: Profile }) {
                 onReturn={session.end}
               />
             )}
-            {session.lastResult && (
-              <ReturnResult session={session.lastResult} onClose={session.dismissResult} />
-            )}
             <p className="muted small">（焚き火はステップ6で作る）</p>
           </section>
 
@@ -116,6 +119,23 @@ function Home({ profile }: { profile: Profile }) {
           onReserve={(title) => setDialog({ kind: 'reserve', title })}
           onTogglePin={quests.togglePin}
           onCancelReservation={quests.cancelReservation}
+        />
+      )}
+
+      {/* 報酬受け取りモーダル（帰還後・受け取っていない報酬があるとき） */}
+      {session.unclaimed && !session.active && (
+        <ReturnResult
+          key={session.unclaimed.id}
+          session={session.unclaimed}
+          xpBefore={profile.xp}
+          onClaim={async (memo, declaredSec) => {
+            const r = await session.claim(memo, declaredSec)
+            return r
+          }}
+          onDone={(r) => {
+            if (r) onProfileChange({ xp: r.xp, gold: r.gold, firewood: r.firewood })
+            void session.closeReward()
+          }}
         />
       )}
 
