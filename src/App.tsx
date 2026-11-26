@@ -3,6 +3,9 @@ import { APP_CATCHPHRASE, APP_NAME, APP_VERSION } from './config/app'
 import { levelFromXp } from './config/level'
 import { NameForm } from './features/auth/NameForm'
 import { useAuth } from './features/auth/useAuth'
+import { Campfire } from './features/campfire/Campfire'
+import { PrivacyToggle } from './features/campfire/PrivacyToggle'
+import { useCampfire } from './features/campfire/useCampfire'
 import { ChallengeDialog } from './features/quests/ChallengeDialog'
 import { QuestActions } from './features/quests/QuestActions'
 import { QuestListPage } from './features/quests/QuestListPage'
@@ -50,6 +53,7 @@ function Home({
 }) {
   const quests = useQuests()
   const session = useQuestSession(quests.refresh)
+  const campfire = useCampfire(profile, session.active)
   const [page, setPage] = useState<Page>('home')
   const [dialog, setDialog] = useState<Dialog>(null)
 
@@ -94,7 +98,8 @@ function Home({
                 onReturn={session.end}
               />
             )}
-            <p className="muted small">（焚き火はステップ6で作る）</p>
+            <Campfire campers={campfire.campers} connected={campfire.connected} />
+            <PrivacyToggle profile={profile} onChange={onProfileChange} />
           </section>
 
           {/* クエストエリア（スマホ：下 / PC：右） */}

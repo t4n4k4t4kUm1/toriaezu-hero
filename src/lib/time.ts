@@ -32,3 +32,13 @@ export function useNow(intervalMs = 1000): number {
   }, [intervalMs])
   return now
 }
+
+/** 経過ミリ秒を「たった今」「5分前」「3時間前」「2日前」の形にする */
+export function formatAgo(ms: number): string {
+  const min = Math.floor(ms / 60000)
+  if (min < 1) return 'たった今'
+  if (min < 60) return `${min}分前`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h}時間前`
+  return `${Math.floor(h / 24)}日前`
+}

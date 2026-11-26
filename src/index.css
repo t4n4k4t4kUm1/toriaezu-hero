@@ -272,3 +272,47 @@ header {
   border-color: var(--accent);
   font-weight: bold;
 }
+
+/* 焚き火 */
+.campfire {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0 8px;
+}
+.fire {
+  font-size: 3rem;
+  line-height: 1;
+}
+.campers {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.camper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  word-break: break-all;
+}
+.camper.me {
+  border-color: var(--accent);
+}
+.camper.questing .camper-status {
+  color: var(--accent);
+}
+.camper.offline {
+  opacity: 0.45; /* オフラインの人は薄暗く */
+}
+.privacy-toggle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  opacity: 0.8;
+}
