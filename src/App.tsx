@@ -85,7 +85,7 @@ function Home({
           <section className="camp-area">
             <p>ようこそ、{profile.name} さん</p>
             <p>
-              Lv.{levelFromXp(profile.xp)} ／ XP {profile.xp} ／ {profile.gold}G ／ 薪 {profile.firewood}本
+              Lv.{levelFromXp(profile.xp)} ／ XP {profile.xp}
             </p>
             {session.active && (
               <QuestSessionPanel
@@ -133,7 +133,7 @@ function Home({
             return r
           }}
           onDone={(r) => {
-            if (r) onProfileChange({ xp: r.xp, gold: r.gold, firewood: r.firewood })
+            if (r) onProfileChange({ xp: r.xp })
             void session.closeReward()
           }}
         />

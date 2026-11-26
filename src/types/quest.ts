@@ -40,9 +40,8 @@ export type QuestSession = {
   declared_duration_sec: number | null
   is_auto_returned: boolean
   memo_log: string | null
-  reward_rarity: string | null
+  reward_rarity: string | null // 宝箱のランク（wood / silver / gold / none）
   earned_xp: number | null
-  earned_gold: number | null
   claimed_at: string | null
 }
 
@@ -59,13 +58,10 @@ export type ReserveInput = {
 /** 報酬を受け取ったときの結果（DB の claim_reward 関数が返すもの） */
 export type ClaimResult = {
   earned_xp: number
-  earned_gold: number
   chest: 'none' | 'wood' | 'silver' | 'gold'
-  rarity: 'none' | 'normal' | 'rare' | 'epic'
-  honest_bonus: boolean
+  /** 自動帰還で、記録より短く正直に申告したか */
+  honest: boolean
   declared_sec: number
-  // 受け取ったあとのプロフィールの値
+  /** 受け取ったあとの XP の合計 */
   xp: number
-  gold: number
-  firewood: number
 }

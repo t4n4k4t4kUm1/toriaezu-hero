@@ -3,20 +3,12 @@
 import { FIRST_STRIKE_SEC } from './quest'
 
 export type ChestRank = 'none' | 'wood' | 'silver' | 'gold'
-export type DropRarity = 'none' | 'normal' | 'rare' | 'epic'
 
 export const CHEST_LABEL: Record<ChestRank, string> = {
   none: 'なし',
   wood: '木の宝箱',
   silver: '銀の宝箱',
   gold: '金の宝箱',
-}
-
-export const DROP_LABEL: Record<DropRarity, string> = {
-  none: '',
-  normal: 'ふつう',
-  rare: 'レア！',
-  epic: '激レア!!',
 }
 
 /** 作業時間（秒）から宝箱のランクを決める */

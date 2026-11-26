@@ -1,12 +1,12 @@
 // 報酬受け取りモーダル（帰還したあとに出る）
 //   1. 自動帰還のときだけ：実際の作業時間を自己申告
 //   2. 1行冒険日誌（必須）を書くと「宝箱を開ける！」が押せる
-//   3. 宝箱を開けると、XP・ゴールド・ドロップが表示される
+//   3. 宝箱を開けると、XP が表示される（のちに宝箱からアイテムが出るようにする予定）
 import { useState, type FormEvent } from 'react'
 import { Modal } from '../../components/Modal'
 import { levelFromXp } from '../../config/level'
 import { FIRST_STRIKE_SEC } from '../../config/quest'
-import { CHEST_LABEL, DECLARE_OPTIONS, DROP_LABEL, chestRankFromSec } from '../../config/rewards'
+import { CHEST_LABEL, DECLARE_OPTIONS, chestRankFromSec } from '../../config/rewards'
 import { formatDuration } from '../../lib/time'
 import type { ClaimResult, SessionWithTitle } from '../../types/quest'
 
@@ -72,13 +72,8 @@ export function ReturnResult({ session, xpBefore, onClaim, onDone }: Props) {
       <Modal title="宝箱を開けた！">
         <div className="reward">
           <p className="chest-name">{CHEST_LABEL[result.chest]}</p>
-          <p className="reward-numbers">
-            XP +{result.earned_xp} ／ {result.earned_gold}G
-          </p>
-          {result.rarity === 'rare' || result.rarity === 'epic' ? (
-            <p className="drop">ドロップ：{DROP_LABEL[result.rarity]}（ゴールド追加）</p>
-          ) : null}
-          {result.honest_bonus && <p>誠実な冒険者ボーナス：薪 +1本</p>}
+          <p className="reward-numbers">XP +{result.earned_xp}</p>
+          {result.honest && <p className="muted small">正直に教えてくれてありがとう。その誠実さこそ勇者の証だ。</p>}
           {leveledUp && <p className="level-up">レベルアップ！ Lv.{levelFromXp(result.xp)}</p>}
           {fulfilledReservation && <p>予約クエスト達成！</p>}
           <button className="primary big full" onClick={() => onDone(result)}>
@@ -111,7 +106,7 @@ export function ReturnResult({ session, xpBefore, onClaim, onDone }: Props) {
                 </button>
               ))}
             </div>
-            <p className="muted small">正直に短く答えると「誠実な冒険者ボーナス」がもらえるよ。</p>
+            <p className="muted small">寝落ちや止め忘れでも大丈夫。正直に教えてね。</p>
           </>
         ) : (
           <p>
